@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>LANDSAFE NER | Landslide Intelligence</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  >
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+
+    <div class="logo">
+      <div class="logo-icon">⌁</div>
+
+      <div>
+        <b>LANDSAFE</b>
+        <small>NER INTELLIGENCE</small>
+      </div>
+    </div>
+
+    <div class="side-label">MONITORING</div>
+
+    <nav>
+
+      <button class="nav active" data-page="dashboard">
+        <span>▦</span>
+        Command Center
+      </button>
+
+      <button class="nav" data-page="riskmap">
+        <span>⌖</span>
+        Risk Map
+      </button>
+
+      <button class="nav" data-page="locations">
+        <span>◉</span>
+        Locations
+      </button>
+
+      <button class="nav" data-page="addlocation">
+        <span>+</span>
+        Add Location
+      </button>
+
+      <button class="nav" data-page="alerts">
+        <span>!</span>
+        Expert Review
+        <em id="reviewNavCount">0</em>
+      </button>
+
+    </nav>
+
+    <div class="sidebar-foot">
+
+      <div class="engine">
+        <i></i>
+
+        <div>
+          <b>Prediction Engine</b>
+          <small>FLASK MODEL · CSV INPUT</small>
+        </div>
+      </div>
+
+      <small class="demo">
+        Risk flags are calculated from original_data.csv.
+      </small>
+
+    </div>
+
+  </aside>
+
+
+  <!-- MAIN -->
+  <main>
+
+    <!-- HEADER -->
+    <header class="header">
+
+      <button class="hamburger" id="hamburger">
+        ☰
+      </button>
+
+      <div>
+        <h1 id="title">Command Center</h1>
+        <p id="subtitle">
+          AI-assisted landslide early warning for Northeast India
+        </p>
+      </div>
+
+      <div class="header-right">
+
+        <span class="live">
+          <i></i>
+          SYSTEM OPERATIONAL
+        </span>
+
+        <span
+          class="imd-live"
+          id="modelFeed"
+          title="Flask model connection status"
+        >
+          <i></i>
+          <strong>
+            FLASK MODEL
+          </strong>
+          <small id="modelFeedText">Loading data</small>
+        </span>
+
+        <span id="clock"></span>
+
+        <div class="avatar">
+          EX
+        </div>
+
+      </div>
+
+    </header>
+
+
+    <div class="content">
+
+      <!-- ================= DASHBOARD ================= -->
+
+      <section id="dashboard" class="page show">
+
+        <div class="hero">
+
+          <div>
+
+            <span class="eyebrow">
+              NORTHEAST INDIA · AI RISK INTELLIGENCE
+            </span>
+
+            <h2>
+              Know where the ground<br>
+              <span>is becoming unstable.</span>
+            </h2>
+
+            <p>
+              Continuous environmental signals are transformed into
+              location-level landslide risk scores for expert assessment.
+            </p>
+
+          </div>
+
+          <div class="hero-status">
+
+            <span>MODEL STATUS</span>
+
+            <b id="modelStatus">LOADING</b>
+
+            <small>
+              Flask model using original_data.csv
+            </small>
+
+          </div>
+
+        </div>
+
+
+        <!-- METRICS -->
+
+        <div class="metrics">
+
+          <article>
+            <span>MONITORED LOCATIONS</span>
+            <b id="monitoredCount">0</b>
+            <small>Across NER</small>
+          </article>
+
+          <article>
+            <span>HIGH RISK</span>
+            <b class="orange" id="highRiskCount">0</b>
+            <small>Requires attention</small>
+          </article>
+
+          <article>
+            <span>CRITICAL</span>
+            <b class="red" id="criticalCount">0</b>
+            <small>Expert review required</small>
+          </article>
+
+          <article>
+            <span>MODEL SOURCE</span>
+            <b>CSV</b>
+            <small>Flask prediction results</small>
+          </article>
+
+        </div>
+
+
+        <!-- MAP + PRIORITY -->
+
+        <div class="dashboard-grid">
+
+          <article class="card map-card">
+
+            <div class="card-head">
+
+              <div>
+                <span class="eyebrow">
+                  GEOSPATIAL VIEW
+                </span>
+
+                <h3>
+                  Northeast India Risk Map
+                </h3>
+              </div>
+
+              <button
+                class="outline"
+                data-page="riskmap"
+              >
+                OPEN MAP ↗
+              </button>
+
+            </div>
+
+            <div id="dashMap" class="map"></div>
+
+            <div class="map-key">
+
+              <span>
+                <i class="low"></i>
+                Low
+              </span>
+
+              <span>
+                <i class="moderate"></i>
+                Moderate
+              </span>
+
+              <span>
+                <i class="high"></i>
+                High
+              </span>
+
+              <span>
+                <i class="critical"></i>
+                Critical
+              </span>
+
+              <small>
+                Flask model results
+              </small>
+
+            </div>
+
+          </article>
+
+
+          <article class="card">
+
+            <div class="card-head">
+
+              <div>
+                <span class="eyebrow">
+                  PRIORITY QUEUE
+                </span>
+
+                <h3>
+                  Locations to review
+                </h3>
+              </div>
+
+            </div>
+
+            <div id="priority"></div>
+
+          </article>
+
+        </div>
+
+      </section>
+
+
+      <!-- ================= RISK MAP ================= -->
+
+      <section id="riskmap" class="page">
+
+        <div class="page-title">
+
+          <div>
+            <span class="eyebrow">
+              GEOSPATIAL INTELLIGENCE
+            </span>
+
+            <h2>Risk Map</h2>
+
+            <p>
+              Explore location-level AI risk across Northeast India.
+            </p>
+          </div>
+
+        </div>
+
+
+        <div class="toolbar">
+
+          <div class="search">
+
+            ⌕
+
+            <input
+              id="search"
+              placeholder="Search location"
+            >
+
+          </div>
+
+          <select id="level">
+
+            <option value="all">
+              All risk levels
+            </option>
+
+            <option value="critical">
+              Critical
+            </option>
+
+            <option value="high">
+              High
+            </option>
+
+            <option value="moderate">
+              Moderate
+            </option>
+
+            <option value="low">
+              Low
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="map-layout">
+
+          <article class="card map-large">
+
+            <div id="fullMap" class="map"></div>
+
+          </article>
+
+
+          <aside
+            class="card inspector"
+            id="inspector"
+          >
+
+            <div class="empty">
+
+              <span>⌖</span>
+
+              <b>
+                Select a monitored location
+              </b>
+
+              <p>
+                Choose a map marker to inspect
+                the AI assessment.
+              </p>
+
+            </div>
+
+          </aside>
+
+        </div>
+
+      </section>
+
+
+      <!-- ================= LOCATIONS ================= -->
+
+      <section id="locations" class="page">
+
+        <div class="page-title">
+
+          <div>
+
+            <span class="eyebrow">
+              MONITORING NETWORK
+            </span>
+
+            <h2>
+              Monitored Locations
+            </h2>
+
+            <p>
+              Locations and risk flags returned by the Flask model.
+            </p>
+
+          </div>
+
+          <div class="count">
+            <span id="locationCount">0 monitored</span>
+          </div>
+
+        </div>
+
+
+        <div
+          class="location-grid"
+          id="locationsGrid"
+        ></div>
+
+      </section>
+
+
+      <!-- ================= ADD LOCATION ================= -->
+
+      <section id="addlocation" class="page">
+
+        <div class="page-title">
+          <div>
+            <span class="eyebrow">DEMONSTRATION INPUT</span>
+            <h2>Add a Location</h2>
+            <p>Enter environmental values to run one new location through the Flask model.</p>
+          </div>
+        </div>
+
+        <article class="card add-location-card">
+          <form id="addLocationForm" class="location-form">
+            <label>
+              Location name
+              <input id="newPlace" name="place" required maxlength="100" placeholder="e.g. Demo Hills">
+            </label>
+            <label>
+              Latitude
+              <input name="latitude" type="number" required step="any" min="6" max="38" placeholder="25.5788">
+            </label>
+            <label>
+              Longitude
+              <input name="longitude" type="number" required step="any" min="68" max="98" placeholder="91.8933">
+            </label>
+            <label>
+              Rainfall total (mm)
+              <input name="rainfall_total_mm" type="number" required step="any" min="0" placeholder="120">
+            </label>
+            <label>
+              Slope angle (degrees)
+              <input name="slope_degrees" type="number" required step="any" min="0" max="90" placeholder="35">
+            </label>
+            <label>
+              Elevation (m)
+              <input name="elevation_m" type="number" required step="any" min="0" placeholder="900">
+            </label>
+            <button class="btn" type="submit" id="addLocationSubmit">RUN MODEL PREDICTION</button>
+          </form>
+          <p id="addLocationResult" class="form-result" aria-live="polite"></p>
+        </article>
+
+      </section>
+
+
+      <!-- ================= ALERTS ================= -->
+
+      <section id="alerts" class="page">
+
+        <div class="page-title">
+
+          <div>
+
+            <span class="eyebrow">
+              DECISION SUPPORT
+            </span>
+
+            <h2>Expert Review</h2>
+
+            <p>
+              High and critical model flags awaiting an expert decision. Decisions are stored for this browser demo session.
+            </p>
+
+          </div>
+
+          <div class="count">
+            <span id="reviewCount">0 pending</span>
+          </div>
+
+        </div>
+
+
+        <div class="risk-guide" aria-label="Risk colour guide">
+          <strong>Risk colour guide</strong>
+          <span><i class="low"></i> Low</span>
+          <span><i class="moderate"></i> Moderate</span>
+          <span><i class="high"></i> High</span>
+          <span><i class="critical"></i> Critical</span>
+        </div>
+
+        <div class="alerts" id="alertsList"></div>
+
+      </section>
+
+
+      <!-- ================= ANALYTICS ================= -->
+
+      <section id="analytics" class="page">
+
+        <div class="page-title">
+
+          <div>
+
+            <span class="eyebrow">
+              MODEL INTELLIGENCE
+            </span>
+
+            <h2>
+              Analytics
+            </h2>
+
+            <p>
+              Illustrative patterns from the proposed prediction system.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="metrics">
+
+          <article>
+            <span>AVERAGE RISK</span>
+            <b>48</b>
+            <small>Regional score</small>
+          </article>
+
+          <article>
+            <span>RISK TREND</span>
+            <b class="orange">+14%</b>
+            <small>Illustrative 7-day change</small>
+          </article>
+
+          <article>
+            <span>HIGH + CRITICAL</span>
+            <b class="red">15</b>
+            <small>Locations</small>
+          </article>
+
+          <article>
+            <span>MODEL CONFIDENCE</span>
+            <b>84%</b>
+            <small>Illustrative</small>
+          </article>
+
+        </div>
+
+
+        <div class="analytics-grid">
+
+          <article class="card">
+
+            <div class="card-head">
+
+              <div>
+                <span class="eyebrow">
+                  DISTRIBUTION
+                </span>
+
+                <h3>
+                  Risk distribution
+                </h3>
+              </div>
+
+            </div>
+
+            <div class="analytics-chart">
+              <canvas id="riskChart"></canvas>
+            </div>
+
+          </article>
+
+
+          <article class="card">
+
+            <div class="card-head">
+
+              <div>
+                <span class="eyebrow">
+                  FEATURE IMPORTANCE
+                </span>
+
+                <h3>
+                  Top risk contributors
+                </h3>
+              </div>
+
+            </div>
+
+            <div id="factors"></div>
+
+          </article>
+
+
+          <article class="card wide">
+
+            <div class="card-head">
+
+              <div>
+                <span class="eyebrow">
+                  REGIONAL TREND
+                </span>
+
+                <h3>
+                  Risk score over time
+                </h3>
+              </div>
+
+            </div>
+
+            <div class="analytics-chart">
+              <canvas id="trend"></canvas>
+            </div>
+
+          </article>
+
+        </div>
+
+      </section>
+
+
+      <!-- ================= DATA SOURCES ================= -->
+
+      <section id="sources" class="page">
+
+        <div class="page-title">
+
+          <div>
+
+            <span class="eyebrow">
+              DATA ARCHITECTURE
+            </span>
+
+            <h2>
+              Data Sources
+            </h2>
+
+            <p>
+              Inputs proposed for the prediction engine.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="pipeline">
+
+          <div>
+            <b>01</b>
+            <strong>Data ingestion</strong>
+            <small>
+              Rainfall and environmental signals
+            </small>
+          </div>
+
+          <span>→</span>
+
+          <div>
+            <b>02</b>
+            <strong>Feature layer</strong>
+            <small>
+              Terrain, soil, vegetation & history
+            </small>
+          </div>
+
+          <span>→</span>
+
+          <div>
+            <b>03</b>
+            <strong>AI prediction</strong>
+            <small>
+              Risk score per location
+            </small>
+          </div>
+
+          <span>→</span>
+
+          <div>
+            <b>04</b>
+            <strong>Expert review</strong>
+            <small>
+              Human decision before escalation
+            </small>
+          </div>
+
+        </div>
+
+
+        <div
+          class="source-grid"
+          id="sourceGrid"
+        ></div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+</div>
+
+
+<div id="toast"></div>
+
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script src="script.js"></script>
+
+</body>
+</html>
