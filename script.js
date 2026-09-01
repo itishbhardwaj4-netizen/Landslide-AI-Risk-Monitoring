@@ -1,5 +1,7 @@
 /* LANDSAFE NER — Flask model-results dashboard. */
-const MODEL_DATA_URL = "http://127.0.0.1:5001/map-data";
+// Production Flask API hosted on Render. Change this only if the backend URL changes.
+const API_BASE_URL = "https://landslide-ai-risk-monitoring.onrender.com";
+const MODEL_DATA_URL = `${API_BASE_URL}/map-data`;
 const colors = { critical: "#b42318", high: "#c65d00", moderate: "#9a6700", low: "#247a3d" };
 const titles = {
   dashboard: ["Command Center", "Model results from original_data.csv"],
@@ -301,7 +303,7 @@ function bindAddLocationForm() {
     if (result) result.textContent = "Sending location to Flask…";
 
     try {
-      const response = await fetch("http://127.0.0.1:5001/predict", {
+      const response = await fetch(`${API_BASE_URL}/predict`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)

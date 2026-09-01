@@ -50,8 +50,24 @@ Live Server usually opens the website at:
 
   http://127.0.0.1:5500
 
-Keep the Flask terminal open while using the website. The website fetches
-model results from http://127.0.0.1:5001/map-data.
+For local development, keep the Flask terminal open while using the website.
+The deployed frontend uses the Render API at:
+
+  https://landslide-ai-risk-monitoring.onrender.com
+
+Deploy the frontend on Render
+-----------------------------
+
+This project includes render.yaml for a Render Static Site. It publishes only
+the website files (index.html, style.css, and script.js), so the model and CSV
+are not exposed by the frontend deployment.
+
+1. Push the latest project changes to GitHub.
+2. In Render, choose New > Static Site and select this repository.
+3. Render will detect render.yaml. Create the service named
+   landsafe-ner-frontend and deploy it.
+4. Open the generated frontend URL. It will fetch predictions from the
+   deployed Flask API automatically.
 
 How to use the website during the demo
 --------------------------------------
